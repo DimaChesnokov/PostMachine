@@ -21,12 +21,16 @@ class PostMachine:
                 self.tape.num(1)
             elif cmd == "?":
                 if self.tape.checknum == 0:
-                    self.current_line = int(args[0]) - 1
+                    self.current_line = int(args[0]) #- 1
                 else:
-                    self.current_line = int(args[1]) - 1
+                    self.current_line = int(args[1]) #- 1
             elif cmd == ".":
                 break
-            self.current_line += 1
+            if cmd !="?":
+                if not args:
+                    self.current_line += 1
+                else:
+                    self.current_line = int(args[0])
 
     def get_tape(self): #вывод всей ленты
         return "".join(map(str, self.tape.left_tape)) + "".join(map(str, self.tape.right_tape))
@@ -64,12 +68,13 @@ class Tape:
 
 if __name__ == "__main__":
     machine = PostMachine()
-    machine.add_command("> 1")
-    machine.add_command("< 2")
-    machine.add_command("1 3")
-    machine.add_command("? 4, 5")
+    machine.add_command(">")
+    machine.add_command("<")
     machine.add_command("1")
-    machine.add_command("0 7")
+    machine.add_command("? 6, 5")
+    machine.add_command("> 6")
+    machine.add_command("<")
+    machine.add_command("1")
     machine.add_command(".")
     
     machine.run()
