@@ -20,17 +20,18 @@ class PostMachine:
             elif cmd == "1":
                 self.tape.num(1)
             elif cmd == "?":
-                if self.tape.checknum == 0:
-                    self.current_line = int(args[0]) #- 1
-                else:
+                if self.tape.checknum != 0:
                     self.current_line = int(args[1]) #- 1
+                else:
+                    self.current_line = int(args[0]) #- 1
             elif cmd == ".":
                 break
             if cmd != "?":
-                if not args:
-                    self.current_line += 1
-                else:
+                if args is not None:
                     self.current_line = int(args[0])
+                else:
+                    self.current_line += 1
+                    
 
     def get_tape(self): #вывод всей ленты
         t = list(reversed(self.tape.left_tape))
@@ -43,23 +44,18 @@ class Tape:
         self.pos_carriage = 0 #позиция каретки
 
     def right(self):
-        print(self.pos_carriage)
         self.pos_carriage += 1
         if self.pos_carriage > 0:
-            print("pos " + str(self.pos_carriage) + " r " + str(len(self.right_tape)))
             if self.pos_carriage + 1 > len(self.right_tape): # если ленты не хватает добавляем ячейку
                 self.right_tape.append(0)
 
     def left(self):
-        print(self.pos_carriage)
         self.pos_carriage -= 1
         if self.pos_carriage == -1:
             if len(self.left_tape) == 0: # добавляем элемент тк изначальна список пуст
-                print("pos " + str(self.pos_carriage) + " l " + str(len(self.left_tape)))
                 self.left_tape.append(0)
         if self.pos_carriage < -1:
             if abs(self.pos_carriage) >= len(self.left_tape): # если ленты не хватает добавляем ячейку
-                print("pos " + str(self.pos_carriage) + " l " + str(len(self.left_tape)))
                 self.left_tape.append(0) 
 
     def num (self, a):
@@ -77,14 +73,14 @@ class Tape:
 
 if __name__ == "__main__":
     machine = PostMachine()
-    machine.add_command(">")#1  00
-    #machine.add_command("<")#2  00
-    machine.add_command("1")#3  10
-    #machine.add_command("? 6, 5")#4 10
-    machine.add_command(">")#5 10
-    #machine.add_command("<")#6 10
-    machine.add_command("1")#7 10
-    machine.add_command(".")#8
+    machine.add_command("> 1")#0  00
+    machine.add_command("< 2")#1  00
+    machine.add_command("1 3")#2  10
+    machine.add_command("? 5 4")#3 10
+    machine.add_command("> 4")#4 10
+    machine.add_command("< 5")#5 10
+    machine.add_command("1 6")#6 10
+    machine.add_command(". 7")#7
     
     machine.run()
     result = machine.get_tape()
