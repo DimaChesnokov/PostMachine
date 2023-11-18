@@ -38,19 +38,20 @@ class Ui(QtWidgets.QMainWindow):
         row=self.tableWidget.rowCount()+1
         
         #Строка для проверки команд
-        txt=".><10?"
+        txtcom=".><10?"
+        
         
         #Нахождение количества строк в таблице
         rowCount = self.tableWidget.rowCount()
         
         #Заполнение таблицы данными
         self.tableWidget.insertRow(rowCount)
-        if com != "" and txt.find(com)!=-1:
+        if com != "" and txtcom.find(com)!=-1:
             self.tableWidget.setItem(rowCount,0,QTableWidgetItem(com))
         else:
             self.tableWidget.setItem(rowCount,0,QTableWidgetItem(tchk))
             
-        if nextCom !="":    
+        if nextCom !="" and Ui.checknum(self)!=-1:    
             self.tableWidget.setItem(rowCount,1,QTableWidgetItem(nextCom))
         else:
             self.tableWidget.setItem(rowCount,1,QTableWidgetItem(str(row)))
@@ -144,6 +145,15 @@ class Ui(QtWidgets.QMainWindow):
         for i in range(self.tableWidget.rowCount()):
             item = QTableWidgetItem(str(i))
             self.tableWidget.setVerticalHeaderItem(i, item)
+    
+    #Провнрка на правильность введённых данных        
+    def checknum(self):
+        textNum="0123456789, "
+        nextCom = self.lineEdit_comNext.text()
+        for i in nextCom:
+            if textNum.find(i)==-1:
+                return -1
+        return 1
         
 #Настройка формы
 if __name__ == "__main__":

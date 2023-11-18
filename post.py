@@ -74,9 +74,8 @@ class Tape:
 if __name__ == "__main__":
     machine = PostMachine()
     
-    machine.add_command("> 1")#7
-   # machine.add_command("> 2")#7
-   # machine.add_command("1 3")#7
+    machine.add_command("1 1")#0
+
     machine.run()
     result = machine.get_tape()
     print("Результат на ленте:", result)
