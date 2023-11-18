@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, uic
 from post import PostMachine, Tape
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QHBoxLayout, QPushButton
 import tkinter as tk
 from tkinter import filedialog
 
@@ -9,6 +9,7 @@ from tkinter import filedialog
 # Загрузка интерфейса из файла PostMachine.ui
 class Ui(QtWidgets.QMainWindow):
     
+    curentBut=15
     #Инициализация
     def __init__(self):
         
@@ -21,6 +22,12 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_importFile.clicked.connect(self.import_command)
         self.pushButton_saveFile.clicked.connect(self.save_command)
         self.pushButton_Clear.clicked.connect(self.Clear_Table)
+        
+        self.pushButton_Right.clicked.connect(self.goRight)
+        self.pushButton_Left.clicked.connect(self.goLeft)
+        
+        #Создание ленты
+        Ui.createTape(self)
         
         #Настройка таблицы для вывода и ввода команд
         self.tableWidget.setColumnCount(2)
@@ -131,7 +138,7 @@ class Ui(QtWidgets.QMainWindow):
         #Выводим результат
         QtWidgets.QMessageBox.warning(self, "Результат", result)
         
-    #Метод для очистки таблицы
+    #Метод для очистки таблицы и ленты
     def Clear_Table(self):
         
         # Очистить содержимое ячеек
@@ -139,7 +146,72 @@ class Ui(QtWidgets.QMainWindow):
         
         # Установить количество строк в 0
         self.tableWidget.setRowCount(0) 
-           
+        
+        hbox=self.horizontalLayout
+        hbox2= self.horizontalLayout_2
+        hbox3= self.horizontalLayout_3
+        Ui.cleanTape(self,hbox)
+        Ui.cleanTape(self,hbox2)
+        Ui.cleanTape(self,hbox3)
+        Ui.createTape(self)
+    
+    #Метод для создания ленты    
+    def createTape(self):
+        hbox=self.horizontalLayout
+        hbox2= self.horizontalLayout_2
+        hbox3= self.horizontalLayout_3
+        k=-15
+        for i in range(31):
+            if(k==0):
+                button = QPushButton("*")
+                button.setStyleSheet("background-color: red; color: white;")
+                hbox3.addWidget(button)
+            else:
+                hbox3.addWidget(QPushButton(""))
+            hbox.addWidget(QPushButton("0"))
+            hbox2.addWidget(QPushButton(str(k)))
+            k=k+1
+        
+        self.setLayout(hbox)
+        self.setLayout(hbox2)
+        self.setLayout(hbox3)
+        Ui.curentBut=15
+    
+    #Метод для очистки ленты
+    def cleanTape(self,hbox):
+        while hbox.count() > 0:
+            item = hbox.takeAt(0)  # Извлекаем элемент с индексом 0
+            widget = item.widget()  # Получаем виджет из элемента
+            if widget is not None:
+                widget.deleteLater()  # Удаляем виджет
+            else:
+                hbox.removeItem(item)  # Удаляем элемент из макета
+                
+    def goRight(self):
+        hbox=self.horizontalLayout
+        hbox2= self.horizontalLayout_2
+        hbox3= self.horizontalLayout_3
+        item = hbox3.itemAt(Ui.curentBut).widget()  
+        item.setText("")
+        item.setStyleSheet("background-color: white; color: black;")
+        Ui.curentBut=Ui.curentBut+1
+        item = hbox3.itemAt(Ui.curentBut).widget()  
+        item.setStyleSheet("background-color: red; color: white;")
+        item.setText("*")
+        
+    def goLeft(self):
+        hbox=self.horizontalLayout
+        hbox2= self.horizontalLayout_2
+        hbox3= self.horizontalLayout_3
+        item = hbox3.itemAt(Ui.curentBut).widget()  
+        item.setText("")
+        item.setStyleSheet("background-color: white; color: black;")
+        Ui.curentBut=Ui.curentBut-1
+        item = hbox3.itemAt(Ui.curentBut).widget()  
+        item.setStyleSheet("background-color: red; color: white;")
+        item.setText("*")
+        
+    
     #Метод для изменения нумерации ячеек    
     def rowsEdit(self):
         for i in range(self.tableWidget.rowCount()):
