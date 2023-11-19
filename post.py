@@ -74,7 +74,13 @@ class Tape:
 if __name__ == "__main__":
     machine = PostMachine()
     
-    machine.add_command("1 1")#0
+    machine.add_command("> 1")#0
+    #если в ячейке 0 то выполняем вторую команду если нет то первую команду
+    machine.add_command("? 2, 3")#1
+    machine.add_command("1 3")#2
+    machine.add_command("> 4")#3
+
+    
 
     machine.run()
     result = machine.get_tape()

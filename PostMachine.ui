@@ -255,30 +255,22 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3"/>
    </widget>
-   <widget class="QPushButton" name="pushButton_Right">
+   <widget class="QPushButton" name="pushButton_resetTape">
     <property name="geometry">
      <rect>
       <x>900</x>
-      <y>330</y>
-      <width>93</width>
-      <height>28</height>
+      <y>290</y>
+      <width>211</width>
+      <height>31</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Right</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_Left">
-    <property name="geometry">
-     <rect>
-      <x>800</x>
-      <y>330</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
     <property name="text">
-     <string>Left</string>
+     <string>Очистить ленту</string>
     </property>
    </widget>
   </widget>
@@ -291,8 +283,39 @@
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Скорость (мс)</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="action500"/>
+    <addaction name="action1000"/>
+    <addaction name="action1500"/>
+    <addaction name="action2000"/>
+   </widget>
+   <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action500">
+   <property name="text">
+    <string>500</string>
+   </property>
+  </action>
+  <action name="action1000">
+   <property name="text">
+    <string>1000</string>
+   </property>
+  </action>
+  <action name="action1500">
+   <property name="text">
+    <string>1500</string>
+   </property>
+  </action>
+  <action name="action2000">
+   <property name="text">
+    <string>2000</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

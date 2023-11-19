@@ -1,7 +1,8 @@
 import sys
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic,QtCore
 from post import PostMachine, Tape
 from PyQt5.QtWidgets import QTableWidgetItem, QHBoxLayout, QPushButton
+from PyQt5.QtGui import QColor
 import tkinter as tk
 from tkinter import filedialog
 
@@ -9,7 +10,9 @@ from tkinter import filedialog
 # Загрузка интерфейса из файла PostMachine.ui
 class Ui(QtWidgets.QMainWindow):
     
-    curentBut=15
+    curentBut=15 #Текущее местоположение каретки
+    timeDistanse=1000 #Скорость анимации
+    
     #Инициализация
     def __init__(self):
         
@@ -22,9 +25,11 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_importFile.clicked.connect(self.import_command)
         self.pushButton_saveFile.clicked.connect(self.save_command)
         self.pushButton_Clear.clicked.connect(self.Clear_Table)
-        
-        self.pushButton_Right.clicked.connect(self.goRight)
-        self.pushButton_Left.clicked.connect(self.goLeft)
+        self.pushButton_resetTape.clicked.connect(self.butCleanTape)
+        self.action500.triggered.connect(self.timeDistanse500)
+        self.action1000.triggered.connect(self.timeDistanse1000)      
+        self.action1500.triggered.connect(self.timeDistanse1500)      
+        self.action2000.triggered.connect(self.timeDistanse2000)                 
         
         #Создание ленты
         Ui.createTape(self)
@@ -123,21 +128,59 @@ class Ui(QtWidgets.QMainWindow):
         
         #Создаем объект класса
         machine = PostMachine()
-
+        time =0
+        
+        check= False
         #Добавляем команды из таблицы на выполнение
         for row in range(self.tableWidget.rowCount()):
             item0 = self.tableWidget.item(row,0)
             item1 = self.tableWidget.item(row,1)
+            
+            hbox=self.horizontalLayout
+            item = hbox.itemAt(Ui.curentBut).widget()
+            
+            #Метод проверки команды ?
+            com=item0.text()
+            if check==False:
+                if str(com)=="?":
+                    check=True
+                    if item.text()=="0":
+                        text=item1.text()
+                        count=text[3]
+                    else:
+                        text=item1.text()
+                        count=text[0]
+                        
+            #Отображение анимации            
+            if (check==False) or (check==True and str(row)==count):
+                time=time+ Ui.timeDistanse
+                check=False
+                if str(com)==">":
+                    QtCore.QTimer.singleShot(time, self.goRight)
+                elif str(com)=="<":
+                    QtCore.QTimer.singleShot(time, self.goLeft)
+                elif str(com)=="1":
+                    QtCore.QTimer.singleShot(time, self.setOne)
+                elif str(com)=="0":
+                    QtCore.QTimer.singleShot(time, self.setZero)
             comText= (f"{item0.text()} {item1.text()}")
             machine.add_command(comText)
-        
+            
         #Запуск программы
         machine.run()
         result = machine.get_tape()
         
         #Выводим результат
-        QtWidgets.QMessageBox.warning(self, "Результат", result)
-        
+        time=time+Ui.timeDistanse
+        QtCore.QTimer.singleShot(time, lambda: QtWidgets.QMessageBox.warning(self, "Результат", result))           
+    
+    #Возвращает целочисленный индекс строки
+    def return_row_index(self,row):
+        if len(row)>1:
+            return 1
+        else:
+            return int(row)
+                   
     #Метод для очистки таблицы и ленты
     def Clear_Table(self):
         
@@ -147,13 +190,8 @@ class Ui(QtWidgets.QMainWindow):
         # Установить количество строк в 0
         self.tableWidget.setRowCount(0) 
         
-        hbox=self.horizontalLayout
-        hbox2= self.horizontalLayout_2
-        hbox3= self.horizontalLayout_3
-        Ui.cleanTape(self,hbox)
-        Ui.cleanTape(self,hbox2)
-        Ui.cleanTape(self,hbox3)
-        Ui.createTape(self)
+        #Очистка ленты
+        Ui.butCleanTape(self)
     
     #Метод для создания ленты    
     def createTape(self):
@@ -177,6 +215,16 @@ class Ui(QtWidgets.QMainWindow):
         self.setLayout(hbox3)
         Ui.curentBut=15
     
+    #Метод для ресета ленты
+    def butCleanTape(self):
+        hbox=self.horizontalLayout
+        hbox2= self.horizontalLayout_2
+        hbox3= self.horizontalLayout_3
+        Ui.cleanTape(self,hbox)
+        Ui.cleanTape(self,hbox2)
+        Ui.cleanTape(self,hbox3)
+        Ui.createTape(self)
+        
     #Метод для очистки ленты
     def cleanTape(self,hbox):
         while hbox.count() > 0:
@@ -186,10 +234,10 @@ class Ui(QtWidgets.QMainWindow):
                 widget.deleteLater()  # Удаляем виджет
             else:
                 hbox.removeItem(item)  # Удаляем элемент из макета
-                
+    
+    #Метод перехода каретки вправо            
     def goRight(self):
-        hbox=self.horizontalLayout
-        hbox2= self.horizontalLayout_2
+
         hbox3= self.horizontalLayout_3
         item = hbox3.itemAt(Ui.curentBut).widget()  
         item.setText("")
@@ -198,10 +246,9 @@ class Ui(QtWidgets.QMainWindow):
         item = hbox3.itemAt(Ui.curentBut).widget()  
         item.setStyleSheet("background-color: red; color: white;")
         item.setText("*")
-        
+    
+    #Метод перехода каретки влево     
     def goLeft(self):
-        hbox=self.horizontalLayout
-        hbox2= self.horizontalLayout_2
         hbox3= self.horizontalLayout_3
         item = hbox3.itemAt(Ui.curentBut).widget()  
         item.setText("")
@@ -210,7 +257,18 @@ class Ui(QtWidgets.QMainWindow):
         item = hbox3.itemAt(Ui.curentBut).widget()  
         item.setStyleSheet("background-color: red; color: white;")
         item.setText("*")
-        
+    
+    #Метод изменения значения ячейки на ленте на 1      
+    def setOne(self):
+        hbox=self.horizontalLayout
+        item = hbox.itemAt(Ui.curentBut).widget()  
+        item.setText("1")
+    
+    #Метод изменения значения ячейки на ленте на 0  
+    def setZero(self):
+        hbox=self.horizontalLayout
+        item = hbox.itemAt(Ui.curentBut).widget()  
+        item.setText("0")
     
     #Метод для изменения нумерации ячеек    
     def rowsEdit(self):
@@ -218,7 +276,7 @@ class Ui(QtWidgets.QMainWindow):
             item = QTableWidgetItem(str(i))
             self.tableWidget.setVerticalHeaderItem(i, item)
     
-    #Провнрка на правильность введённых данных        
+    #Проверка на правильность введённых данных        
     def checknum(self):
         textNum="0123456789, "
         nextCom = self.lineEdit_comNext.text()
@@ -226,6 +284,16 @@ class Ui(QtWidgets.QMainWindow):
             if textNum.find(i)==-1:
                 return -1
         return 1
+    
+    #Изменение скорости анимации
+    def timeDistanse500(self):
+        Ui.timeDistanse=500    
+    def timeDistanse1000(self):
+        Ui.timeDistanse=1000
+    def timeDistanse1500(self):
+        Ui.timeDistanse=1500
+    def timeDistanse2000(self):
+        Ui.timeDistanse=2000
         
 #Настройка формы
 if __name__ == "__main__":
