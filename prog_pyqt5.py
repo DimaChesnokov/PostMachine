@@ -130,6 +130,8 @@ class Ui(QtWidgets.QMainWindow):
         machine = PostMachine()
         time =0
         
+        self.lineEdit_result.setText("")
+        
         check= False
         #Добавляем команды из таблицы на выполнение
         for row in range(self.tableWidget.rowCount()):
@@ -172,7 +174,7 @@ class Ui(QtWidgets.QMainWindow):
         
         #Выводим результат
         time=time+Ui.timeDistanse
-        QtCore.QTimer.singleShot(time, lambda: QtWidgets.QMessageBox.warning(self, "Результат", result))           
+        QtCore.QTimer.singleShot(time, lambda: self.lineEdit_result.setText(result))
     
     #Возвращает целочисленный индекс строки
     def return_row_index(self,row):
@@ -192,6 +194,7 @@ class Ui(QtWidgets.QMainWindow):
         
         #Очистка ленты
         Ui.butCleanTape(self)
+        self.lineEdit_result.setText("")
     
     #Метод для создания ленты    
     def createTape(self):
@@ -224,6 +227,7 @@ class Ui(QtWidgets.QMainWindow):
         Ui.cleanTape(self,hbox2)
         Ui.cleanTape(self,hbox3)
         Ui.createTape(self)
+        self.lineEdit_result.setText("")
         
     #Метод для очистки ленты
     def cleanTape(self,hbox):
