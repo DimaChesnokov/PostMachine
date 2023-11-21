@@ -18,7 +18,28 @@ class TestPostMachine(unittest.TestCase):
     def test_left(self): #Аналогично с тестом test_right, только в другую сторону. Проверка, что будет -1
         self.machine.tape.left()
         self.assertEqual(self.machine.tape.pos_carriage, -1)
+        
+  
+   #- Вызывается метод num у ленты машины с аргументом 0, который записывает значение 0 на текущую позицию ленты.
+   # - Проверяется, что содержимое ленты равно "0".
+    def test_num(self):
+        self.machine.tape.num(0)
+        self.assertEqual(self.machine.get_tape(), "0")
+    
+    
+    # Вызывается метод num у ленты машины с аргументом 1, который записывает значение 1 на текущую позицию ленты.
+    # Вызывается метод checknum у ленты машины, который возвращает значение на текущей позиции ленты.
+    # Проверяется, что возвращенное значение равно 1.
+    def test_checknum(self):
+        self.machine.tape.num(1)
+        self.assertEqual(self.machine.tape.checknum(), 1)
+    
+    
+    
     
 
 if __name__ == "__main__":
+    print("Тесты выполнены.")
     unittest.main()
+    
+    
