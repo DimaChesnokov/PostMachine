@@ -21,8 +21,10 @@ class PostMachine:
                 self.tape.num(1)
             elif cmd == "?":
                 if self.tape.checknum != 0:
+                    num=self.tape.checknum
                     self.current_line = int(args[1]) #- 1
                 else:
+                    num=self.tape.checknum
                     self.current_line = int(args[0]) #- 1
             elif cmd == ".":
                 break
@@ -67,18 +69,22 @@ class Tape:
 
     def checknum(self):
         if self.pos_carriage < 0:
-            return self.left_tape[abs(self.pos_carriage) - 1]
+            num=self.left_tape[abs(self.pos_carriage) - 1]
+            return num
         else:
-            return self.right_tape[self.pos_carriage]# чтение числа из ячейки
+            num=self.right_tape[self.pos_carriage]# чтение числа из ячейки
+            return num
 
 if __name__ == "__main__":
     machine = PostMachine()
     
-    machine.add_command("> 1")#0
+    machine.add_command("0 1")#0
     #если в ячейке 0 то выполняем вторую команду если нет то первую команду
-    machine.add_command("? 2, 3")#1
-    machine.add_command("1 3")#2
-    machine.add_command("> 4")#3
+    machine.add_command("? 2, 4")#1
+    machine.add_command("0 3")#2
+    machine.add_command("? 4, 5")#3
+    machine.add_command("1 5")#4
+    machine.add_command(". 6")#5
 
     
 

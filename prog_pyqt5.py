@@ -12,6 +12,7 @@ class Ui(QtWidgets.QMainWindow):
     
     curentBut=15 #Текущее местоположение каретки
     timeDistanse=1000 #Скорость анимации
+    listNum=[]
     
     #Инициализация
     def __init__(self):
@@ -133,28 +134,32 @@ class Ui(QtWidgets.QMainWindow):
         self.lineEdit_result.setText("")
         
         check= False
+        checkStop= False
+        postNumStr="0"
         #Добавляем команды из таблицы на выполнение
         for row in range(self.tableWidget.rowCount()):
             item0 = self.tableWidget.item(row,0)
             item1 = self.tableWidget.item(row,1)
             
-            hbox=self.horizontalLayout
-            item = hbox.itemAt(Ui.curentBut).widget()
+            
+            itemtxt=Ui.listNum[Ui.curentBut]
             
             #Метод проверки команды ?
             com=item0.text()
             if check==False:
                 if str(com)=="?":
                     check=True
-                    if item.text()=="0":
+                    if itemtxt=="0":
                         text=item1.text()
                         count=text[3]
+                        postNumStr=text[3]
                     else:
                         text=item1.text()
                         count=text[0]
+                        postNumStr=text[0]
                         
             #Отображение анимации            
-            if (check==False) or (check==True and str(row)==count):
+            if (check==False and checkStop==False and str(row)==postNumStr) or (check==True and str(row)==count and checkStop==False and str(row)==postNumStr):
                 time=time+ Ui.timeDistanse
                 check=False
                 if str(com)==">":
@@ -163,8 +168,13 @@ class Ui(QtWidgets.QMainWindow):
                     QtCore.QTimer.singleShot(time, self.goLeft)
                 elif str(com)=="1":
                     QtCore.QTimer.singleShot(time, self.setOne)
+                    Ui.listNum[Ui.curentBut]="1"
                 elif str(com)=="0":
                     QtCore.QTimer.singleShot(time, self.setZero)
+                    Ui.listNum[Ui.curentBut]="0"
+                elif str(com)==".":
+                    checkStop=True
+                postNumStr=item1.text()
             comText= (f"{item0.text()} {item1.text()}")
             machine.add_command(comText)
             
@@ -210,6 +220,7 @@ class Ui(QtWidgets.QMainWindow):
             else:
                 hbox3.addWidget(QPushButton(""))
             hbox.addWidget(QPushButton("0"))
+            Ui.listNum.append("0")
             hbox2.addWidget(QPushButton(str(k)))
             k=k+1
         
@@ -234,6 +245,7 @@ class Ui(QtWidgets.QMainWindow):
         while hbox.count() > 0:
             item = hbox.takeAt(0)  # Извлекаем элемент с индексом 0
             widget = item.widget()  # Получаем виджет из элемента
+            Ui.listNum.clear()
             if widget is not None:
                 widget.deleteLater()  # Удаляем виджет
             else:
