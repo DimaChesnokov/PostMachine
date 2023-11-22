@@ -20,12 +20,12 @@ class PostMachine:
             elif cmd == "1":
                 self.tape.num(1)
             elif cmd == "?":
-                if self.tape.checknum != 0:
-                    num=self.tape.checknum
-                    self.current_line = int(args[1]) #- 1
-                else:
-                    num=self.tape.checknum
+                if self.tape.checknum() != 0:
+                    args[0] = args[0][:-1]
                     self.current_line = int(args[0]) #- 1
+                    
+                else:
+                    self.current_line = int(args[1]) #- 1
             elif cmd == ".":
                 break
             if cmd != "?":
@@ -78,7 +78,7 @@ class Tape:
 if __name__ == "__main__":
     machine = PostMachine()
     
-    machine.add_command("0 1")#0
+    machine.add_command("1 1")#0
     #если в ячейке 0 то выполняем вторую команду если нет то первую команду
     machine.add_command("? 2, 4")#1
     machine.add_command("0 3")#2
