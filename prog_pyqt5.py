@@ -91,7 +91,10 @@ class Ui(QtWidgets.QMainWindow):
                     items = line.strip().split()  # Предполагаем, что данные разделены табуляцией
                     
                     for j, item in enumerate(items):
-                        item = QTableWidgetItem(item)
+                        if (len(item)==3):
+                            item = QTableWidgetItem(item[0]+item[1]+" "+item[2])    #Правильная запись ? как 2, 4 а не 2,4
+                        else:
+                            item = QTableWidgetItem(item)
                         self.tableWidget.setItem(i, j, item)
                         
         #Переделываем номера строк для удобства                    
@@ -117,7 +120,10 @@ class Ui(QtWidgets.QMainWindow):
                         item = self.tableWidget.item(row, column)
                         if item is not None:
                             cell_data = item.text()
-                            row_data.append(cell_data)
+                            if (len(cell_data)==4):
+                                row_data.append(cell_data[0]+cell_data[1]+cell_data[3]) #Правильная запись ? как 2,4 а не 2, 4
+                            else:
+                                row_data.append(cell_data)
                         else:
                             row_data.append("")
                     file.write("\t".join(row_data) + "\n")
@@ -127,64 +133,68 @@ class Ui(QtWidgets.QMainWindow):
     #Метод запуска программы
     def start_machine(self):
         
-        #Создаем объект класса
-        machine = PostMachine()
-        time =0
-        
-        self.lineEdit_result.setText("")
-        
-        check= False
-        checkStop= False
-        postNumStr="0"
-        #Добавляем команды из таблицы на выполнение
-        for row in range(self.tableWidget.rowCount()):
-            item0 = self.tableWidget.item(row,0)
-            item1 = self.tableWidget.item(row,1)
+        try:
+            #Создаем объект класса
+            machine = PostMachine()
+            time =0
             
+            self.lineEdit_result.setText("")
             
-            itemtxt=Ui.listNum[Ui.curentBut]
+            check= False
+            checkStop= False
+            postNumStr="0"
+            #Добавляем команды из таблицы на выполнение
+            for row in range(self.tableWidget.rowCount()):
+                item0 = self.tableWidget.item(row,0)
+                item1 = self.tableWidget.item(row,1)
+                
+                
+                itemtxt=Ui.listNum[Ui.curentBut]
+                
+                #Метод проверки команды ?
+                com=item0.text()
+                if check==False:
+                    if str(com)=="?":
+                        check=True
+                        if itemtxt=="0":
+                            text=item1.text()
+                            count=text[3]
+                            postNumStr=text[3]
+                        else:
+                            text=item1.text()
+                            count=text[0]
+                            postNumStr=text[0]
+                            
+                #Отображение анимации            
+                if (check==False and checkStop==False and str(row)==postNumStr) or (check==True and str(row)==count and checkStop==False and str(row)==postNumStr):
+                    time=time+ Ui.timeDistanse
+                    check=False
+                    if str(com)==">":
+                        QtCore.QTimer.singleShot(time, self.goRight)
+                    elif str(com)=="<":
+                        QtCore.QTimer.singleShot(time, self.goLeft)
+                    elif str(com)=="1":
+                        QtCore.QTimer.singleShot(time, self.setOne)
+                        Ui.listNum[Ui.curentBut]="1"
+                    elif str(com)=="0":
+                        QtCore.QTimer.singleShot(time, self.setZero)
+                        Ui.listNum[Ui.curentBut]="0"
+                    elif str(com)==".":
+                        checkStop=True
+                    postNumStr=item1.text()
+                comText= (f"{item0.text()} {item1.text()}")
+                machine.add_command(comText)
+                
+            #Запуск программы
+            machine.run()
+            result = machine.get_tape()
             
-            #Метод проверки команды ?
-            com=item0.text()
-            if check==False:
-                if str(com)=="?":
-                    check=True
-                    if itemtxt=="0":
-                        text=item1.text()
-                        count=text[3]
-                        postNumStr=text[3]
-                    else:
-                        text=item1.text()
-                        count=text[0]
-                        postNumStr=text[0]
-                        
-            #Отображение анимации            
-            if (check==False and checkStop==False and str(row)==postNumStr) or (check==True and str(row)==count and checkStop==False and str(row)==postNumStr):
-                time=time+ Ui.timeDistanse
-                check=False
-                if str(com)==">":
-                    QtCore.QTimer.singleShot(time, self.goRight)
-                elif str(com)=="<":
-                    QtCore.QTimer.singleShot(time, self.goLeft)
-                elif str(com)=="1":
-                    QtCore.QTimer.singleShot(time, self.setOne)
-                    Ui.listNum[Ui.curentBut]="1"
-                elif str(com)=="0":
-                    QtCore.QTimer.singleShot(time, self.setZero)
-                    Ui.listNum[Ui.curentBut]="0"
-                elif str(com)==".":
-                    checkStop=True
-                postNumStr=item1.text()
-            comText= (f"{item0.text()} {item1.text()}")
-            machine.add_command(comText)
-            
-        #Запуск программы
-        machine.run()
-        result = machine.get_tape()
-        
-        #Выводим результат
-        time=time+Ui.timeDistanse
-        QtCore.QTimer.singleShot(time, lambda: self.lineEdit_result.setText(result))
+            #Выводим результат
+            time=time+Ui.timeDistanse
+            QtCore.QTimer.singleShot(time, lambda: self.lineEdit_result.setText(result))
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, f"Ошибка!", "Возможно вы не правильно ввели команду.\nПроверьте введённые вами команды.\n"+str({e}))
+
     
     #Возвращает целочисленный индекс строки
     def return_row_index(self,row):
@@ -300,6 +310,7 @@ class Ui(QtWidgets.QMainWindow):
             if textNum.find(i)==-1:
                 return -1
         return 1
+        
     
     #Изменение скорости анимации
     def timeDistanse500(self):
