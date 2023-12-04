@@ -26,6 +26,7 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_importFile.clicked.connect(self.import_command)
         self.pushButton_saveFile.clicked.connect(self.save_command)
         self.pushButton_Clear.clicked.connect(self.Clear_Table)
+        self.pushButton_spravka.clicked.connect(self.get_spravka)
         self.pushButton_resetTape.clicked.connect(self.butCleanTape)
         self.action500.triggered.connect(self.timeDistanse500)
         self.action1000.triggered.connect(self.timeDistanse1000)      
@@ -91,8 +92,8 @@ class Ui(QtWidgets.QMainWindow):
                     items = line.strip().split()  # Предполагаем, что данные разделены табуляцией
                     
                     for j, item in enumerate(items):
-                        if (len(item)==3):
-                            item = QTableWidgetItem(item[0]+item[1]+" "+item[2])    #Правильная запись ? как 2, 4 а не 2,4
+                        if (len(item)>=3):
+                            item = QTableWidgetItem(Ui.readingStr(item))    #Правильная запись ? как 2, 4 а не 2,4
                         else:
                             item = QTableWidgetItem(item)
                         self.tableWidget.setItem(i, j, item)
@@ -120,8 +121,8 @@ class Ui(QtWidgets.QMainWindow):
                         item = self.tableWidget.item(row, column)
                         if item is not None:
                             cell_data = item.text()
-                            if (len(cell_data)==4):
-                                row_data.append(cell_data[0]+cell_data[1]+cell_data[3]) #Правильная запись ? как 2,4 а не 2, 4
+                            if (len(cell_data)>=4):
+                                row_data.append(Ui.writingStr(cell_data))   #Правильная запись ? как 2,4 а не 2, 4
                             else:
                                 row_data.append(cell_data)
                         else:
@@ -321,6 +322,41 @@ class Ui(QtWidgets.QMainWindow):
         Ui.timeDistanse=1500
     def timeDistanse2000(self):
         Ui.timeDistanse=2000
+    
+    #для записи ? в файл с большими числами
+    def writingStr(cell_data):
+        result=""
+        for str in range(len(cell_data)):
+            if cell_data[str]!=" ":
+                result=result+cell_data[str]
+        return result
+    
+    #для вывода ? из файла с большими числами
+    def readingStr(item):
+        result=""
+        for str in range(len(item)):
+            if item[str]==",":
+                result=result+item[str]+" "
+            else:
+                 result=result+item[str]          
+        return result
+    
+    #Метод при вызове справки    
+    def get_spravka(self):
+        str0="В приложении 'Машина Поста':\n"
+        str1="-Для записи в поле 'Команда' использовать только символы: '?.<>10'\n"
+        str2="-Для записи в поле 'Номер следующей команды' использовать только формат ввода чисел или 'число, число'\n"
+        str3="-Для добавления команды в таблицу нажать 'Добавить команду'\n"
+        str4="-Для того чтобы сохранить программу, нужно ввести в поле 'Название файла' название файла и добавить расширение (.txt), затем нажать на кнопку 'Сохранить программу'\n"
+        str5="-Для того чтобы импортировать программу нужно нажать на кнопку 'Импортировать программу' и выбрать нужный файл в открывшемся окне\n"
+        str6="-Для запуска программы нажать на 'Запуск'\n"
+        str7="-Для очистки таблицы нажать на 'Очистить'\n"
+        str8="-Для очистки ленты нажать на 'Очистить ленту'\n"
+        str9="-Для выбора скрости анимации нажать на 'Скорость (мс)' и выбрать нужную скорость\n"
+        strComplete=str0+str1+str2+str3+str4+str5+str6+str7+str8+str9+str0
+        QtWidgets.QMessageBox.information(self, "Справка", strComplete)
+        
+
         
 #Настройка формы
 if __name__ == "__main__":
